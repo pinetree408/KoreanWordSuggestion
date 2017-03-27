@@ -68,6 +68,11 @@ public class KeyboardView extends View {
         return String.valueOf(keyboardCharList[id]);
     }
 
+    public String getKeyPos(String a) {
+        String pos = keyboardCharPos.get(new String(keyboardCharList).indexOf(a));
+        return pos;
+    }
+
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(

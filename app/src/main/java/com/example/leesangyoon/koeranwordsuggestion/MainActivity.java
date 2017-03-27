@@ -5,18 +5,23 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.textservice.SentenceSuggestionsInfo;
 import android.view.textservice.SpellCheckerSession;
 import android.view.textservice.SuggestionsInfo;
 import android.view.textservice.TextInfo;
 import android.view.textservice.TextServicesManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements SpellCheckerSession.SpellCheckerSessionListener {
 
@@ -27,7 +32,19 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
     private EditText editView;
     private TextView inputView;
 
+    Button changeListView;
+    Button changeOctupus;
+
     private int suggestionOption = 1;
+    View suggetListLayout;
+    TextView suggestListItem1View;
+    TextView suggestListItem2View;
+    TextView suggestListItem3View;
+    View octupusLayout;
+    TextView octupusItem1View;
+    TextView octupusItem2View;
+    TextView octupusItem3View;
+
     private TextView suggest1View;
     private TextView suggest2View;
     private TextView suggest3View;
@@ -37,8 +54,10 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
     private TextView spaceView;
     private TextView deleteView;
 
+    List<String> suggestedList;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -50,9 +69,18 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
 
         inputView = (TextView) findViewById(R.id.input);
 
+        changeOctupus = (Button) findViewById(R.id.change_octupus);
+        changeListView = (Button) findViewById(R.id.change_list_view);
+
         suggest1View = (TextView) findViewById(R.id.suggest1);
         suggest2View = (TextView) findViewById(R.id.suggest2);
         suggest3View = (TextView) findViewById(R.id.suggest3);
+
+        LayoutInflater vi1 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        suggetListLayout = vi1.inflate(R.layout.suggest_list, null);
+
+        LayoutInflater vi2 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        octupusLayout = vi2.inflate(R.layout.octupus_layout, null);
 
         keyboardView = (KeyboardView) findViewById(R.id.keyboard);
 
@@ -60,24 +88,89 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
         spaceView = (TextView) findViewById(R.id.space);
         deleteView = (TextView) findViewById(R.id.delete);
 
+        suggestedList = new ArrayList<String>();
+
+        changeOctupus.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (changeOctupus.getClass() == v.getClass()) {
+                            if (suggetListLayout.getParent() != null) {
+                                removeSuggestionList();
+                            }
+                            suggestionOption = 2;
+                            suggest1View.setVisibility(View.GONE);
+                            suggest2View.setVisibility(View.GONE);
+                            suggest3View.setVisibility(View.GONE);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
+        changeListView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (changeListView.getClass() == v.getClass()) {
+                            if (octupusLayout.getParent() != null) {
+                                removeSuggestionList();
+                            }
+                            suggestionOption = 1;
+                            suggest1View.setVisibility(View.VISIBLE);
+                            suggest2View.setVisibility(View.VISIBLE);
+                            suggest3View.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
         keyboardView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (keyboardView.getClass() == v.getClass()) {
-                        String[] params = getInputInfo(event);
-                        editView.setText(editView.getText() + params[0]);
-                        editView.setSelection(editView.getText().length());
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (keyboardView.getClass() == v.getClass()) {
+                            String[] params = getInputInfo(event);
+                            editView.setText(editView.getText() + params[0]);
+                            editView.setSelection(editView.getText().length());
 
-                        if (mScs != null) {
-                            if (isSentenceSpellCheckSupported()) {
-                                mScs.getSentenceSuggestions(new TextInfo[]{new TextInfo(String.valueOf(editView.getText()))}, 18);
+                            if (mScs != null) {
+                                if (isSentenceSpellCheckSupported()) {
+                                    mScs.getSentenceSuggestions(new TextInfo[]{new TextInfo(String.valueOf(editView.getText()))}, 18);
+                                }
+                            }
+                            switch (suggestionOption) {
+                                case 2:
+                                    if (octupusLayout.getParent() != null) {
+                                        removeSuggestionList();
+                                    }
+                                    setSuggestionList();
+                                    break;
                             }
                         }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (keyboardView.getClass() == v.getClass()) {
+                            switch (suggestionOption) {
+                                case 2:
+                                    //removeSuggestionList();
+                                    break;
+                            }
+                        }
+                        break;
 
-                    }
                 }
                 return true;
             }
@@ -92,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                     if (enterView.getClass() == v.getClass()) {
                         inputView.setText(inputView.getText() + String.valueOf(editView.getText()));
                         editView.setText("");
+
                         suggest1View.setText("");
                         suggest2View.setText("");
                         suggest3View.setText("");
@@ -155,13 +249,129 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
             }
         });
 
+        suggest1View.setOnTouchListener(new View.OnTouchListener() {
 
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (suggest1View.getClass() == v.getClass()) {
+                        Log.d(TAG, "TOUCH");
+                        setSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (suggest1View.getClass() == v.getClass()) {
+                        removeSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_MOVE){
+                    if (suggest1View.getClass() == v.getClass()) {
+                        Log.d(TAG, "MOVE");
+                    }
+                }
+                return true;
+            }
+        });
+    }
 
+    public void setSuggestionList() {
+        switch(suggestionOption) {
+            case 1:
+                addContentView(suggetListLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                suggestListItem1View = (TextView) findViewById(R.id.suggest_list_item1);
+                suggestListItem2View = (TextView) findViewById(R.id.suggest_list_item2);
+                suggestListItem3View = (TextView) findViewById(R.id.suggest_list_item3);
 
+                if (suggestedList.size() > 2) {
+                    suggestListItem1View.setText(suggestedList.get(0));
+                    suggestListItem2View.setText(suggestedList.get(1));
+                    suggestListItem3View.setText(suggestedList.get(2));
+                } else if (suggestedList.size() == 2) {
+                    suggestListItem1View.setText(suggestedList.get(0));
+                    suggestListItem2View.setText(suggestedList.get(1));
+                    suggestListItem3View.setText("");
+                } else if (suggestedList.size() == 1) {
+                    suggestListItem1View.setText(suggestedList.get(0));
+                    suggestListItem2View.setText("");
+                    suggestListItem3View.setText("");
+                } else {
+                    suggestListItem1View.setText("");
+                    suggestListItem2View.setText("");
+                    suggestListItem3View.setText("");
+                }
+                break;
+            case 2:
+                addContentView(octupusLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                octupusItem1View = (TextView) findViewById(R.id.octupus_item1);
+                octupusItem2View = (TextView) findViewById(R.id.octupus_item2);
+                octupusItem3View = (TextView) findViewById(R.id.octupus_item3);
+
+                if (suggestedList.size() > 2) {
+                    octupusItem1View.setText(suggestedList.get(0));
+                    octupusItem2View.setText(suggestedList.get(1));
+                    octupusItem3View.setText(suggestedList.get(2));
+                } else if (suggestedList.size() == 2) {
+                    octupusItem1View.setText(suggestedList.get(0));
+                    octupusItem2View.setText(suggestedList.get(1));
+                    octupusItem3View.setText("");
+                } else if (suggestedList.size() == 1) {
+                    octupusItem1View.setText(suggestedList.get(0));
+                    octupusItem2View.setText("");
+                    octupusItem3View.setText("");
+                } else {
+                    octupusItem1View.setText("");
+                    octupusItem2View.setText("");
+                    octupusItem3View.setText("");
+                }
+
+                Random generator = new Random();
+
+                if (octupusItem1View.getText().length() > 0) {
+                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
+                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
+                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
+                    octupusItem1View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                }
+
+                if (octupusItem2View.getText().length() > 0) {
+                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
+                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos("c").split("-")[0]);
+                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos("c").split("-")[1]);
+                    octupusItem2View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                }
+
+                if (octupusItem3View.getText().length() > 1) {
+                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
+                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
+                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
+                    octupusItem3View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                }
+                break;
+        }
+    }
+
+    public void removeSuggestionList() {
+        switch(suggestionOption) {
+            case 1:
+                ((ViewGroup) suggetListLayout.getParent()).removeView(suggetListLayout);
+                break;
+            case 2:
+                ((ViewGroup) octupusLayout.getParent()).removeView(octupusLayout);
+                break;
+        }
     }
 
     private boolean isSentenceSpellCheckSupported() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        final TextServicesManager tsm = (TextServicesManager) getSystemService(
+                Context.TEXT_SERVICES_MANAGER_SERVICE);
+        mScs = tsm.newSpellCheckerSession(null, null, this, true);
     }
 
     @Override
@@ -200,6 +410,8 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
             }
         }
         Log.d(TAG, result.toString());
+        suggestedList.clear();
+        suggestedList.addAll(result);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
