@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
 
     private int suggestionOption = 1;
     View suggetListLayout;
+    View placeholder;
+    int position;
     TextView suggestListItem1View;
     TextView suggestListItem2View;
     TextView suggestListItem3View;
@@ -273,12 +275,63 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                 return true;
             }
         });
+
+        suggest2View.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (suggest2View.getClass() == v.getClass()) {
+                        Log.d(TAG, "TOUCH");
+                        setSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (suggest2View.getClass() == v.getClass()) {
+                        removeSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_MOVE){
+                    if (suggest2View.getClass() == v.getClass()) {
+                        Log.d(TAG, "MOVE");
+                    }
+                }
+                return true;
+            }
+        });
+
+        suggest3View.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (suggest3View.getClass() == v.getClass()) {
+                        Log.d(TAG, "TOUCH");
+                        setSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (suggest3View.getClass() == v.getClass()) {
+                        removeSuggestionList();
+                    }
+                }
+                if (event.getAction() == MotionEvent.ACTION_MOVE){
+                    if (suggest3View.getClass() == v.getClass()) {
+                        Log.d(TAG, "MOVE");
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     public void setSuggestionList() {
         switch(suggestionOption) {
             case 1:
                 addContentView(suggetListLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                placeholder = (View) findViewById(R.id.placeholder);
                 suggestListItem1View = (TextView) findViewById(R.id.suggest_list_item1);
                 suggestListItem2View = (TextView) findViewById(R.id.suggest_list_item2);
                 suggestListItem3View = (TextView) findViewById(R.id.suggest_list_item3);
@@ -300,6 +353,14 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                     suggestListItem2View.setText("");
                     suggestListItem3View.setText("");
                 }
+
+                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        (float) position
+                );
+                placeholder.setLayoutParams(param);
+
                 break;
             case 2:
                 addContentView(octupusLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -431,6 +492,20 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                     suggest1View.setText("");
                     suggest2View.setText("");
                     suggest3View.setText("");
+                }
+                TextView[] viewSet = {
+                        suggest1View,
+                        suggest2View,
+                        suggest3View
+                };
+
+                position = new Random().nextInt(3);
+                for(int i = 0; i < 3; i++) {
+                    if (i == position) {
+                        viewSet[i].setBackground(getResources().getDrawable(R.drawable.border_gray));
+                    } else {
+                        viewSet[i].setBackground(getResources().getDrawable(R.drawable.border_white));
+                    }
                 }
             }
         });

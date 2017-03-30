@@ -21,10 +21,22 @@ public class KeyboardView extends View {
             'z', 'x', 'c', 'v', 'b', 'n', 'm'
     };
 
+    char[] keyboardCharListKo = {
+            'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ',
+            'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ',
+            'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'
+    };
+
     char[][] keyboardChar = {
             {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
             {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'},
             {'z', 'x', 'c', 'v', 'b', 'n', 'm'}
+    };
+
+    char[][] keyboardCharKo = {
+            {'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'},
+            {'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'},
+            {'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'}
     };
 
     List<String> keyboardCharPos;
@@ -65,7 +77,7 @@ public class KeyboardView extends View {
             return ".";
         }
 
-        return String.valueOf(keyboardCharList[id]);
+        return String.valueOf(keyboardCharListKo[id]);
     }
 
     public String getKeyPos(String a) {
@@ -82,7 +94,7 @@ public class KeyboardView extends View {
 
         keyboardPaint = new Paint();
         keyboardPaint.setAntiAlias(true);
-        keyboardPaint.setTextSize(30);
+        keyboardPaint.setTextSize(35);
         keyboardPaint.setTextAlign(Paint.Align.CENTER);
         keyboardPaint.setFakeBoldText(true);
 
@@ -113,8 +125,8 @@ public class KeyboardView extends View {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 10; j++) {
-                if (j < keyboardChar[i].length) {
-                    String content = String.valueOf(keyboardChar[i][j]);
+                if (j < keyboardCharKo[i].length) {
+                    String content = String.valueOf(keyboardCharKo[i][j]);
 
                     float leftPadding = (float) (keyboardPaddingLeft + j * keyWidth + (keyWidth * 0.5));
                     float topPadding = (float) (keyboardPaddingTop + i * keyHeight + (keyHeight * 0.5));
