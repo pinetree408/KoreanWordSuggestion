@@ -47,9 +47,7 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
     TextView octupusItem2View;
     TextView octupusItem3View;
 
-    private TextView suggest1View;
-    private TextView suggest2View;
-    private TextView suggest3View;
+    List<TextView> suggestViewList;
 
     private KeyboardView keyboardView;
     private TextView enterView;
@@ -74,9 +72,10 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
         changeOctupus = (Button) findViewById(R.id.change_octupus);
         changeListView = (Button) findViewById(R.id.change_list_view);
 
-        suggest1View = (TextView) findViewById(R.id.suggest1);
-        suggest2View = (TextView) findViewById(R.id.suggest2);
-        suggest3View = (TextView) findViewById(R.id.suggest3);
+        suggestViewList = new ArrayList<TextView>();
+        suggestViewList.add((TextView) findViewById(R.id.suggest1));
+        suggestViewList.add((TextView) findViewById(R.id.suggest2));
+        suggestViewList.add((TextView) findViewById(R.id.suggest3));
 
         LayoutInflater vi1 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         suggetListLayout = vi1.inflate(R.layout.suggest_list, null);
@@ -104,9 +103,9 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                                 removeSuggestionList();
                             }
                             suggestionOption = 2;
-                            suggest1View.setVisibility(View.GONE);
-                            suggest2View.setVisibility(View.GONE);
-                            suggest3View.setVisibility(View.GONE);
+                            for (TextView suggestView : suggestViewList) {
+                                suggestView.setVisibility(View.GONE);
+                            }
                         }
                         break;
                 }
@@ -126,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                                 removeSuggestionList();
                             }
                             suggestionOption = 1;
-                            suggest1View.setVisibility(View.VISIBLE);
-                            suggest2View.setVisibility(View.VISIBLE);
-                            suggest3View.setVisibility(View.VISIBLE);
+                            for (TextView suggestView : suggestViewList) {
+                                suggestView.setVisibility(View.VISIBLE);
+                            }
                         }
                         break;
                 }
@@ -188,9 +187,9 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                         inputView.setText(inputView.getText() + String.valueOf(editView.getText()));
                         editView.setText("");
 
-                        suggest1View.setText("");
-                        suggest2View.setText("");
-                        suggest3View.setText("");
+                        for (TextView suggestView : suggestViewList) {
+                            suggestView.setText("");
+                        }
                     }
                 }
                 return true;
@@ -236,14 +235,14 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                                     }
                                 }
                             } else {
-                                suggest1View.setText("");
-                                suggest2View.setText("");
-                                suggest3View.setText("");
+                                for (TextView suggestView : suggestViewList) {
+                                    suggestView.setText("");
+                                }
                             }
                         } else {
-                            suggest1View.setText("");
-                            suggest2View.setText("");
-                            suggest3View.setText("");
+                            for (TextView suggestView : suggestViewList) {
+                                suggestView.setText("");
+                            }
                         }
                     }
                 }
@@ -251,80 +250,35 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
             }
         });
 
-        suggest1View.setOnTouchListener(new View.OnTouchListener() {
+        for (int i = 0; i < suggestViewList.size(); i++) {
+            final TextView suggestView = suggestViewList.get(i);
+            final int index = i;
+            suggestView.setOnTouchListener(new View.OnTouchListener() {
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (suggest1View.getClass() == v.getClass()) {
-                        Log.d(TAG, "TOUCH");
-                        setSuggestionList();
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    // TODO Auto-generated method stub
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        if (suggestView.getClass() == v.getClass()) {
+                            Log.d(TAG, "TOUCH");
+                            setSuggestionList();
+                        }
                     }
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (suggest1View.getClass() == v.getClass()) {
-                        removeSuggestionList();
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (suggestView.getClass() == v.getClass()) {
+                            removeSuggestionList();
+                        }
                     }
-                }
-                if (event.getAction() == MotionEvent.ACTION_MOVE){
-                    if (suggest1View.getClass() == v.getClass()) {
-                        Log.d(TAG, "MOVE");
+                    if (event.getAction() == MotionEvent.ACTION_MOVE){
+                        if (suggestView.getClass() == v.getClass()) {
+                            Log.d(TAG, "MOVE");
+                        }
                     }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
 
-        suggest2View.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (suggest2View.getClass() == v.getClass()) {
-                        Log.d(TAG, "TOUCH");
-                        setSuggestionList();
-                    }
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (suggest2View.getClass() == v.getClass()) {
-                        removeSuggestionList();
-                    }
-                }
-                if (event.getAction() == MotionEvent.ACTION_MOVE){
-                    if (suggest2View.getClass() == v.getClass()) {
-                        Log.d(TAG, "MOVE");
-                    }
-                }
-                return true;
-            }
-        });
-
-        suggest3View.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (suggest3View.getClass() == v.getClass()) {
-                        Log.d(TAG, "TOUCH");
-                        setSuggestionList();
-                    }
-                }
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (suggest3View.getClass() == v.getClass()) {
-                        removeSuggestionList();
-                    }
-                }
-                if (event.getAction() == MotionEvent.ACTION_MOVE){
-                    if (suggest3View.getClass() == v.getClass()) {
-                        Log.d(TAG, "MOVE");
-                    }
-                }
-                return true;
-            }
-        });
+        }
     }
 
     public void setSuggestionList() {
@@ -477,34 +431,41 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
             @Override
             public void run() {
                 if (result.size() > 2) {
-                    suggest1View.setText(result.get(0));
-                    suggest2View.setText(result.get(1));
-                    suggest3View.setText(result.get(2));
+                    for (int i = 0; i < suggestViewList.size(); i++) {
+                        TextView suggestView = suggestViewList.get(i);
+                        suggestView.setText(i);
+                    }
                 } else if (result.size() == 2) {
-                    suggest1View.setText(result.get(0));
-                    suggest2View.setText(result.get(1));
-                    suggest3View.setText("");
+                    for (int i = 0; i < suggestViewList.size(); i++) {
+                        TextView suggestView = suggestViewList.get(i);
+                        if (i == 2) {
+                            suggestView.setText("");
+                        } else {
+                            suggestView.setText(i);
+                        }
+                    }
                 } else if (result.size() == 1) {
-                    suggest1View.setText(result.get(0));
-                    suggest2View.setText("");
-                    suggest3View.setText("");
+                    for (int i = 0; i < suggestViewList.size(); i++) {
+                        TextView suggestView = suggestViewList.get(i);
+                        if (i == 0) {
+                            suggestView.setText(i);
+                        } else {
+                            suggestView.setText("");
+                        }
+                    }
                 } else {
-                    suggest1View.setText("");
-                    suggest2View.setText("");
-                    suggest3View.setText("");
+                    for (int i = 0; i < suggestViewList.size(); i++) {
+                        TextView suggestView = suggestViewList.get(i);
+                        suggestView.setText("");
+                    }
                 }
-                TextView[] viewSet = {
-                        suggest1View,
-                        suggest2View,
-                        suggest3View
-                };
 
-                position = new Random().nextInt(3);
-                for(int i = 0; i < 3; i++) {
+                position = new Random().nextInt(suggestViewList.size());
+                for(int i = 0; i < suggestViewList.size(); i++) {
                     if (i == position) {
-                        viewSet[i].setBackground(getResources().getDrawable(R.drawable.border_gray));
+                        suggestViewList.get(i).setBackground(getResources().getDrawable(R.drawable.border_gray));
                     } else {
-                        viewSet[i].setBackground(getResources().getDrawable(R.drawable.border_white));
+                        suggestViewList.get(i).setBackground(getResources().getDrawable(R.drawable.border_white));
                     }
                 }
             }
