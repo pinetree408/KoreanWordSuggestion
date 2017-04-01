@@ -351,8 +351,8 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
 
                 if (octupusItem2View.getText().length() > 0) {
                     String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
-                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos("c").split("-")[0]);
-                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos("c").split("-")[1]);
+                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
+                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
                     octupusItem2View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
                 }
 
