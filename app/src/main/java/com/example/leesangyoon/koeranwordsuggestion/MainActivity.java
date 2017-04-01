@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -55,6 +56,16 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
     private TextView deleteView;
 
     List<String> suggestedList;
+
+
+    private static char[] cho = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
+            'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
+    private static char[] jung = { 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ',
+            'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ',
+            'ㅣ' };
+    private static char[] jong = { ' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ',
+            'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
+            'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -144,12 +155,46 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                     case MotionEvent.ACTION_DOWN:
                         if (keyboardView.getClass() == v.getClass()) {
                             String[] params = getInputInfo(event);
-                            editView.setText(editView.getText() + params[0]);
+                            String inputString = "";
+                            if (editView.getText().length() > 0) {
+                                char targetChar = editView.getText().charAt(editView.getText().length()-1);
+                                int charCode = (int) targetChar;
+                                if (charCode >= 0xAC00) {
+                                    int c = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
+                                    int j = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) % 21;
+                                    int z = (charCode - 0xAC00) % 28;
+
+                                    int choIndex = Arrays.asList(cho).indexOf((char) c);
+                                    int jungIndex = Arrays.asList(jung).indexOf((char) j);
+
+                                    int jongIndex = 0;
+                                    if (z >= 0) {
+                                        jongIndex = Arrays.asList(jong).indexOf((char) z);
+                                    }
+
+                                    int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
+                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length()-1));
+                                    inputString += (char) combine;
+
+                                } else {
+                                    int choIndex = Arrays.asList(cho).indexOf(targetChar);
+                                    int jungIndex = Arrays.asList(jung).indexOf(params[0]);
+                                    int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
+                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length()-1));
+                                    inputString += (char) combine;
+                                }
+                                //Log.d(TAG, charCode + ","+  c + "," + j + "," + z);
+                            } else {
+                                inputString = editView.getText() + params[0];
+                            }
+
+                            editView.setText(inputString);
+                            //editView.setText(editView.getText() + params[0]);
                             editView.setSelection(editView.getText().length());
 
                             if (mScs != null) {
                                 if (isSentenceSpellCheckSupported()) {
-                                    mScs.getSentenceSuggestions(new TextInfo[]{new TextInfo(String.valueOf(editView.getText()))}, 18);
+                                    //mScs.getSentenceSuggestions(new TextInfo[]{new TextInfo(String.valueOf(editView.getText()))}, 18);
                                 }
                             }
                             switch (suggestionOption) {
