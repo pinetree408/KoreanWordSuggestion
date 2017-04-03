@@ -58,12 +58,12 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
     List<String> suggestedList;
 
 
-    private static char[] cho = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
+    char[] cho = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
-    private static char[] jung = { 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ',
+    char[] jung = { 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ',
             'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ',
             'ㅣ' };
-    private static char[] jong = { ' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ',
+    char[] jong = { ' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ',
             'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
@@ -160,30 +160,38 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
                                 char targetChar = editView.getText().charAt(editView.getText().length()-1);
                                 int charCode = (int) targetChar;
                                 if (charCode >= 0xAC00) {
-                                    int c = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
-                                    int j = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) % 21;
-                                    int z = (charCode - 0xAC00) % 28;
+                                    int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
+                                    int jungIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) % 21;
+                                    int jongIndex = (charCode - 0xAC00) % 28;
 
-                                    int choIndex = Arrays.asList(cho).indexOf((char) c);
-                                    int jungIndex = Arrays.asList(jung).indexOf((char) j);
+                                    if (jongIndex > 0) {
+                                        if (getIndexOf(cho, params[0].charAt(0)) != -1) {
+                                            inputString = editView.getText() + params[0];
+                                        } else {
+                                            int preCombine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
+                                            int combine = 0xAC00 + 28 * 21 * getIndexOf(cho, jong[jongIndex]) + 28 * getIndexOf(jung, params[0].charAt(0));
+                                            inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                            inputString += (char) preCombine;
+                                            inputString += (char) combine;
 
-                                    int jongIndex = 0;
-                                    if (z >= 0) {
-                                        jongIndex = Arrays.asList(jong).indexOf((char) z);
+                                        }
+                                    } else {
+                                        jongIndex = getIndexOf(jong, params[0].charAt(0));
+                                        if (jongIndex != -1) {
+                                            int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
+                                            inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                            inputString += (char) combine;
+                                        } else {
+                                            inputString = editView.getText() + params[0];
+                                        }
                                     }
-
-                                    int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
-                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length()-1));
-                                    inputString += (char) combine;
-
                                 } else {
-                                    int choIndex = Arrays.asList(cho).indexOf(targetChar);
-                                    int jungIndex = Arrays.asList(jung).indexOf(params[0]);
+                                    int choIndex = getIndexOf(cho, targetChar);
+                                    int jungIndex = getIndexOf(jung, params[0].charAt(0));
                                     int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
-                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length()-1));
+                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
                                     inputString += (char) combine;
                                 }
-                                //Log.d(TAG, charCode + ","+  c + "," + j + "," + z);
                             } else {
                                 inputString = editView.getText() + params[0];
                             }
@@ -324,6 +332,18 @@ public class MainActivity extends AppCompatActivity implements SpellCheckerSessi
             });
 
         }
+    }
+
+    public int getIndexOf(char[] sourceList, char target) {
+
+        int ret = -1;
+        for (int index = 0; index < sourceList.length; index++) {
+            if (target == sourceList[index]) {
+                ret = index;
+                break;
+            }
+        }
+        return ret;
     }
 
     public void setSuggestionList() {
