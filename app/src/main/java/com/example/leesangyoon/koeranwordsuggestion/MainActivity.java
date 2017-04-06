@@ -322,41 +322,25 @@ public class MainActivity extends AppCompatActivity {
                 result.add(item);
             }
         }
+        if (result.size() == 2) {
+            result.add("");
+        } else if (result.size() == 1) {
+            result.add("");
+            result.add("");
+        } else if (result.size() == 0) {
+            result.add("");
+            result.add("");
+            result.add("");
+        }
         suggestedList.clear();
         suggestedList.addAll(result);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (result.size() > 2) {
-                    for (int i = 0; i < suggestViewList.size(); i++) {
-                        TextView suggestView = suggestViewList.get(i);
-                        suggestView.setText(result.get(i));
-                    }
-                } else if (result.size() == 2) {
-                    for (int i = 0; i < suggestViewList.size(); i++) {
-                        TextView suggestView = suggestViewList.get(i);
-                        if (i == 2) {
-                            suggestView.setText("");
-                        } else {
-                            suggestView.setText(result.get(i));
-                        }
-                    }
-                } else if (result.size() == 1) {
-                    for (int i = 0; i < suggestViewList.size(); i++) {
-                        TextView suggestView = suggestViewList.get(i);
-                        if (i == 0) {
-                            suggestView.setText(result.get(i));
-                        } else {
-                            suggestView.setText("");
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < suggestViewList.size(); i++) {
-                        TextView suggestView = suggestViewList.get(i);
-                        suggestView.setText("");
-                    }
+                for (int i = 0; i < suggestViewList.size(); i++) {
+                    TextView suggestView = suggestViewList.get(i);
+                    suggestView.setText(result.get(i));
                 }
-
                 position = new Random().nextInt(suggestViewList.size());
                 for(int i = 0; i < suggestViewList.size(); i++) {
                     if (i == position) {
@@ -389,23 +373,9 @@ public class MainActivity extends AppCompatActivity {
                 suggestListItem2View = (TextView) findViewById(R.id.suggest_list_item2);
                 suggestListItem3View = (TextView) findViewById(R.id.suggest_list_item3);
 
-                if (suggestedList.size() > 2) {
-                    suggestListItem1View.setText(suggestedList.get(0));
-                    suggestListItem2View.setText(suggestedList.get(1));
-                    suggestListItem3View.setText(suggestedList.get(2));
-                } else if (suggestedList.size() == 2) {
-                    suggestListItem1View.setText(suggestedList.get(0));
-                    suggestListItem2View.setText(suggestedList.get(1));
-                    suggestListItem3View.setText("");
-                } else if (suggestedList.size() == 1) {
-                    suggestListItem1View.setText(suggestedList.get(0));
-                    suggestListItem2View.setText("");
-                    suggestListItem3View.setText("");
-                } else {
-                    suggestListItem1View.setText("");
-                    suggestListItem2View.setText("");
-                    suggestListItem3View.setText("");
-                }
+                suggestListItem1View.setText(suggestedList.get(0));
+                suggestListItem2View.setText(suggestedList.get(1));
+                suggestListItem3View.setText(suggestedList.get(2));
 
                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                         0,
@@ -421,23 +391,9 @@ public class MainActivity extends AppCompatActivity {
                 octupusItem2View = (TextView) findViewById(R.id.octupus_item2);
                 octupusItem3View = (TextView) findViewById(R.id.octupus_item3);
 
-                if (suggestedList.size() > 2) {
-                    octupusItem1View.setText(suggestedList.get(0));
-                    octupusItem2View.setText(suggestedList.get(1));
-                    octupusItem3View.setText(suggestedList.get(2));
-                } else if (suggestedList.size() == 2) {
-                    octupusItem1View.setText(suggestedList.get(0));
-                    octupusItem2View.setText(suggestedList.get(1));
-                    octupusItem3View.setText("");
-                } else if (suggestedList.size() == 1) {
-                    octupusItem1View.setText(suggestedList.get(0));
-                    octupusItem2View.setText("");
-                    octupusItem3View.setText("");
-                } else {
-                    octupusItem1View.setText("");
-                    octupusItem2View.setText("");
-                    octupusItem3View.setText("");
-                }
+                octupusItem1View.setText(suggestedList.get(0));
+                octupusItem2View.setText(suggestedList.get(1));
+                octupusItem3View.setText(suggestedList.get(2));
 
                 Random generator = new Random();
 
@@ -455,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
                     octupusItem2View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
                 }
 
-                if (octupusItem3View.getText().length() > 1) {
+                if (octupusItem3View.getText().length() > 0) {
                     String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
                     int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
                     int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
