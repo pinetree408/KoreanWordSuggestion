@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         editView = (EditText) findViewById(R.id.edit);
-
         inputView = (TextView) findViewById(R.id.input);
 
         changeOctupus = (Button) findViewById(R.id.change_octupus);
@@ -82,207 +82,18 @@ public class MainActivity extends AppCompatActivity {
         octupusLayout = vi2.inflate(R.layout.octupus_layout, null);
 
         keyboardView = (KeyboardView) findViewById(R.id.keyboard);
-
         enterView = (TextView) findViewById(R.id.enter);
         spaceView = (TextView) findViewById(R.id.space);
         deleteView = (TextView) findViewById(R.id.delete);
 
         suggestedList = new ArrayList<String>();
 
-        changeOctupus.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (changeOctupus.getClass() == v.getClass()) {
-                            if (suggetListLayout.getParent() != null) {
-                                removeSuggestionList();
-                            }
-                            suggestionOption = 2;
-                            for (TextView suggestView : suggestViewList) {
-                                suggestView.setVisibility(View.GONE);
-                            }
-                        }
-                        break;
-                }
-                return true;
-            }
-        });
-
-        changeListView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (changeListView.getClass() == v.getClass()) {
-                            if (octupusLayout.getParent() != null) {
-                                removeSuggestionList();
-                            }
-                            suggestionOption = 1;
-                            for (TextView suggestView : suggestViewList) {
-                                suggestView.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        break;
-                }
-                return true;
-            }
-        });
-
-        keyboardView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (keyboardView.getClass() == v.getClass()) {
-                            String[] params = getInputInfo(event);
-                            String inputString = "";
-                            if (editView.getText().length() > 0) {
-                                char targetChar = editView.getText().charAt(editView.getText().length()-1);
-                                int charCode = (int) targetChar;
-                                if (charCode >= 0xAC00) {
-                                    int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
-                                    int jungIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) % 21;
-                                    int jongIndex = (charCode - 0xAC00) % 28;
-
-                                    if (jongIndex > 0) {
-                                        if (getIndexOf(cho, params[0].charAt(0)) != -1) {
-                                            inputString = editView.getText() + params[0];
-                                        } else {
-                                            int preCombine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
-                                            int combine = 0xAC00 + 28 * 21 * getIndexOf(cho, jong[jongIndex]) + 28 * getIndexOf(jung, params[0].charAt(0));
-                                            inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
-                                            inputString += (char) preCombine;
-                                            inputString += (char) combine;
-
-                                        }
-                                    } else {
-                                        jongIndex = getIndexOf(jong, params[0].charAt(0));
-                                        if (jongIndex != -1) {
-                                            int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
-                                            inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
-                                            inputString += (char) combine;
-                                        } else {
-                                            inputString = editView.getText() + params[0];
-                                        }
-                                    }
-                                } else {
-                                    int choIndex = getIndexOf(cho, targetChar);
-                                    int jungIndex = getIndexOf(jung, params[0].charAt(0));
-                                    int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
-                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
-                                    inputString += (char) combine;
-                                }
-                            } else {
-                                inputString = editView.getText() + params[0];
-                            }
-
-                            editView.setText(inputString);
-                            //editView.setText(editView.getText() + params[0]);
-                            editView.setSelection(editView.getText().length());
-                            Log.d(TAG, String.valueOf(editView.getText()));
-                            getSuggestion(String.valueOf(editView.getText()));
-                            /*
-                            if (mScs != null) {
-                                if (isSentenceSpellCheckSupported()) {
-                                    mScs.getSentenceSuggestions(new TextInfo[]{new TextInfo(String.valueOf(editView.getText()))}, 18);
-                                }
-                            }
-                            */
-                            switch (suggestionOption) {
-                                case 2:
-                                    if (octupusLayout.getParent() != null) {
-                                        removeSuggestionList();
-                                    }
-                                    setSuggestionList();
-                                    break;
-                            }
-                        }
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (keyboardView.getClass() == v.getClass()) {
-                            switch (suggestionOption) {
-                                case 2:
-                                    //removeSuggestionList();
-                                    break;
-                            }
-                        }
-                        break;
-
-                }
-                return true;
-            }
-        });
-
-        enterView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (enterView.getClass() == v.getClass()) {
-                        inputView.setText(inputView.getText() + String.valueOf(editView.getText()));
-                        editView.setText("");
-
-                        for (TextView suggestView : suggestViewList) {
-                            suggestView.setText("");
-                        }
-                    }
-                }
-                return true;
-            }
-        });
-
-        spaceView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (spaceView.getClass() == v.getClass()) {
-                        editView.setText(editView.getText() + " ");
-                        editView.setSelection(editView.getText().length());
-                        getSuggestion(String.valueOf(editView.getText()));
-                    }
-                }
-                return true;
-            }
-        });
-
-        deleteView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (deleteView.getClass() == v.getClass()) {
-                        if (editView.getText().length() > 0) {
-                            editView.setText(editView.getText().subSequence(0, editView.getText().length() - 1));
-                            editView.setSelection(editView.getText().length());
-
-                            if (editView.getText().length() > 0) {
-                                getSuggestion(String.valueOf(editView.getText()));
-                            } else {
-                                for (TextView suggestView : suggestViewList) {
-                                    suggestView.setText("");
-                                }
-                            }
-                        } else {
-                            for (TextView suggestView : suggestViewList) {
-                                suggestView.setText("");
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-        });
+        changeOctupus.setOnTouchListener(this);
+        changeListView.setOnTouchListener(this);
+        keyboardView.setOnTouchListener(this);
+        enterView.setOnTouchListener(this);
+        spaceView.setOnTouchListener(this);
+        deleteView.setOnTouchListener(this);
 
         for (int i = 0; i < suggestViewList.size(); i++) {
             final TextView suggestView = suggestViewList.get(i);
@@ -294,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                     // TODO Auto-generated method stub
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         if (suggestView.getClass() == v.getClass()) {
-                            Log.d(TAG, "TOUCH");
                             setSuggestionList();
                         }
                     }
@@ -313,6 +123,140 @@ public class MainActivity extends AppCompatActivity {
             });
 
         }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.change_list_view:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (octupusLayout.getParent() != null) {
+                            removeSuggestionList();
+                        }
+                        suggestionOption = 1;
+                        for (TextView suggestView : suggestViewList) {
+                            suggestView.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                }
+                break;
+            case R.id.change_octupus:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (suggetListLayout.getParent() != null) {
+                            removeSuggestionList();
+                        }
+                        suggestionOption = 2;
+                        for (TextView suggestView : suggestViewList) {
+                            suggestView.setVisibility(View.GONE);
+                        }
+                        break;
+                }
+                break;
+            case R.id.keyboard:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        String[] params = getInputInfo(event);
+                        String inputString = "";
+                        if (editView.getText().length() > 0) {
+                            char targetChar = editView.getText().charAt(editView.getText().length()-1);
+                            int charCode = (int) targetChar;
+                            if (charCode >= 0xAC00) {
+                                int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
+                                int jungIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) % 21;
+                                int jongIndex = (charCode - 0xAC00) % 28;
+
+                                if (jongIndex > 0) {
+                                    if (getIndexOf(cho, params[0].charAt(0)) != -1) {
+                                        inputString = editView.getText() + params[0];
+                                    } else {
+                                        int preCombine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
+                                        int combine = 0xAC00 + 28 * 21 * getIndexOf(cho, jong[jongIndex]) + 28 * getIndexOf(jung, params[0].charAt(0));
+                                        inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                        inputString += (char) preCombine;
+                                        inputString += (char) combine;
+
+                                    }
+                                } else {
+                                    jongIndex = getIndexOf(jong, params[0].charAt(0));
+                                    if (jongIndex != -1) {
+                                        int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
+                                        inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                        inputString += (char) combine;
+                                    } else {
+                                        inputString = editView.getText() + params[0];
+                                    }
+                                }
+                            } else {
+                                int choIndex = getIndexOf(cho, targetChar);
+                                int jungIndex = getIndexOf(jung, params[0].charAt(0));
+                                int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex;
+                                inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                inputString += (char) combine;
+                            }
+                        } else {
+                            inputString = editView.getText() + params[0];
+                        }
+
+                        editView.setText(inputString);
+                        editView.setSelection(editView.getText().length());
+                        getSuggestion(String.valueOf(editView.getText()));
+
+                        switch (suggestionOption) {
+                            case 2:
+                                if (octupusLayout.getParent() != null) {
+                                    removeSuggestionList();
+                                }
+                                setSuggestionList();
+                                break;
+                        }
+                        break;
+                }
+                break;
+            case R.id.space:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        editView.setText(editView.getText() + " ");
+                        editView.setSelection(editView.getText().length());
+                        getSuggestion(String.valueOf(editView.getText()));
+                        break;
+                }
+                break;
+            case R.id.delete:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (editView.getText().length() > 0) {
+                            editView.setText(editView.getText().subSequence(0, editView.getText().length() - 1));
+                            editView.setSelection(editView.getText().length());
+                            if (editView.getText().length() > 0) {
+                                getSuggestion(String.valueOf(editView.getText()));
+                            } else {
+                                for (TextView suggestView : suggestViewList) {
+                                    suggestView.setText("");
+                                }
+                            }
+                        } else {
+                            for (TextView suggestView : suggestViewList) {
+                                suggestView.setText("");
+                            }
+                        }
+                        break;
+                }
+                break;
+            case R.id.enter:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        inputView.setText(inputView.getText() + String.valueOf(editView.getText()));
+                        editView.setText("");
+                        for (TextView suggestView : suggestViewList) {
+                            suggestView.setText("");
+                        }
+                        break;
+                }
+                break;
+        }
+        return true;
     }
 
     public void getSuggestion(String input) {
@@ -445,4 +389,5 @@ public class MainActivity extends AppCompatActivity {
         };
         return params;
     }
+
 }
