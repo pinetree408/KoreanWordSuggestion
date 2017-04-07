@@ -32,15 +32,14 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     View suggetListLayout;
     View placeholder;
     int position;
-    TextView suggestListItem1View;
-    TextView suggestListItem2View;
-    TextView suggestListItem3View;
+    int selected;
     View octupusLayout;
     TextView octupusItem1View;
     TextView octupusItem2View;
     TextView octupusItem3View;
 
     List<TextView> suggestViewList;
+    List<TextView> suggestItemList;
 
     private KeyboardView keyboardView;
     private TextView enterView;
@@ -75,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         suggestViewList.add((TextView) findViewById(R.id.suggest2));
         suggestViewList.add((TextView) findViewById(R.id.suggest3));
 
+        suggestItemList = new ArrayList<TextView>();
+
         LayoutInflater vi1 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         suggetListLayout = vi1.inflate(R.layout.suggest_list, null);
 
@@ -103,19 +104,18 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     // TODO Auto-generated method stub
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        if (suggestView.getClass() == v.getClass()) {
-                            setSuggestionList();
-                        }
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        if (suggestView.getClass() == v.getClass()) {
-                            removeSuggestionList();
-                        }
-                    }
-                    if (event.getAction() == MotionEvent.ACTION_MOVE){
-                        if (suggestView.getClass() == v.getClass()) {
-                            Log.d(TAG, "MOVE");
+                    if (suggestView.getClass() == v.getClass()) {
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                setSuggestionList();
+                                break;
+                            case MotionEvent.ACTION_UP:
+                                editView.setText(suggestItemList.get(selected).getText());
+                                removeSuggestionList();
+                                break;
+                            case MotionEvent.ACTION_MOVE:
+                                selected = (int)(event.getY() / 158);
+                                break;
                         }
                     }
                     return true;
@@ -312,22 +312,20 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         switch(suggestionOption) {
             case 1:
                 addContentView(suggetListLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item1));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item2));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item3));
+
+                for (int i = 0; i < suggestItemList.size(); i++) {
+                    suggestItemList.get(i).setText(suggestedList.get(i));
+                }
                 placeholder = (View) findViewById(R.id.placeholder);
-                suggestListItem1View = (TextView) findViewById(R.id.suggest_list_item1);
-                suggestListItem2View = (TextView) findViewById(R.id.suggest_list_item2);
-                suggestListItem3View = (TextView) findViewById(R.id.suggest_list_item3);
-
-                suggestListItem1View.setText(suggestedList.get(0));
-                suggestListItem2View.setText(suggestedList.get(1));
-                suggestListItem3View.setText(suggestedList.get(2));
-
                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         (float) position
                 );
                 placeholder.setLayoutParams(param);
-
                 break;
             case 2:
                 addContentView(octupusLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
