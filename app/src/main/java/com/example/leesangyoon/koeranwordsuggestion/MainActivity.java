@@ -34,9 +34,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     int position;
     int selected;
     View octupusLayout;
-    TextView octupusItem1View;
-    TextView octupusItem2View;
-    TextView octupusItem3View;
+    List<TextView> octupusItemList;
 
     List<TextView> suggestViewList;
     List<TextView> suggestItemList;
@@ -75,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         suggestViewList.add((TextView) findViewById(R.id.suggest3));
 
         suggestItemList = new ArrayList<TextView>();
+        octupusItemList = new ArrayList<TextView>();
 
         LayoutInflater vi1 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         suggetListLayout = vi1.inflate(R.layout.suggest_list, null);
@@ -98,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
         for (int i = 0; i < suggestViewList.size(); i++) {
             final TextView suggestView = suggestViewList.get(i);
-            final int index = i;
             suggestView.setOnTouchListener(new View.OnTouchListener() {
 
                 @Override
@@ -329,35 +327,22 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 break;
             case 2:
                 addContentView(octupusLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                octupusItem1View = (TextView) findViewById(R.id.octupus_item1);
-                octupusItem2View = (TextView) findViewById(R.id.octupus_item2);
-                octupusItem3View = (TextView) findViewById(R.id.octupus_item3);
-
-                octupusItem1View.setText(suggestedList.get(0));
-                octupusItem2View.setText(suggestedList.get(1));
-                octupusItem3View.setText(suggestedList.get(2));
+                octupusItemList.add((TextView) findViewById(R.id.octupus_item1));
+                octupusItemList.add((TextView) findViewById(R.id.octupus_item2));
+                octupusItemList.add((TextView) findViewById(R.id.octupus_item3));
+                for (int i = 0; i < octupusItemList.size(); i++) {
+                    octupusItemList.get(i).setText(suggestedList.get(i));
+                }
 
                 Random generator = new Random();
 
-                if (octupusItem1View.getText().length() > 0) {
-                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
-                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
-                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
-                    octupusItem1View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
-                }
-
-                if (octupusItem2View.getText().length() > 0) {
-                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
-                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
-                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
-                    octupusItem2View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
-                }
-
-                if (octupusItem3View.getText().length() > 0) {
-                    String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
-                    int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
-                    int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
-                    octupusItem3View.setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                for (int i = 0; i < octupusItemList.size(); i++) {
+                    if (octupusItemList.get(i).getText().length() > 0) {
+                        String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
+                        int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
+                        int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
+                        octupusItemList.get(i).setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                    }
                 }
                 break;
         }
