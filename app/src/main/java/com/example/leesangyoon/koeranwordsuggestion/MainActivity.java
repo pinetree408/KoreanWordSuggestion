@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -30,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     private int suggestionOption = 1;
 
     View suggetListLayout;
-    View placeholder;
-    int position;
+    int selectPosition;
+    int[] position;
     int selected;
     List<TextView> suggestViewList;
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     private TextView spaceView;
     private TextView deleteView;
 
-    String[][] suggestedList;
+    List<List<String>> suggestedList;
 
     char[] cho = { 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
@@ -61,10 +63,11 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        suggestedList = new String[][]{
-                {"", "", ""},
-                {"", "", ""},
-                {"", "", ""}
+        suggestedList = new ArrayList<List<String>>(
+                Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
+        );
+        position = new int[] {
+                0, 0, 0
         };
 
         editView = (EditText) findViewById(R.id.edit);
@@ -101,37 +104,52 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
         for (int i = 0; i < suggestViewList.size(); i++) {
             final TextView suggestView = suggestViewList.get(i);
-            suggestView.setOnTouchListener(new View.OnTouchListener() {
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    // TODO Auto-generated method stub
-                    if (suggestView.getClass() == v.getClass()) {
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                setSuggestionList();
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                editView.setText(suggestItemList.get(selected).getText());
-                                editView.setSelection(editView.getText().length());
-                                getSuggestion(String.valueOf(editView.getText()));
-                                removeSuggestionList();
-                                break;
-                            case MotionEvent.ACTION_MOVE:
-                                selected = (int)(event.getY() / 158);
-                                break;
-                        }
-                    }
-                    return true;
-                }
-            });
-
+            suggestView.setOnTouchListener(this);
         }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {
+            case R.id.suggest1:
+            case R.id.suggest2:
+            case R.id.suggest3:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        switch (v.getId()) {
+                            case R.id.suggest1:
+                                selectPosition = 0;
+                                break;
+                            case R.id.suggest2:
+                                selectPosition = 1;
+                                break;
+                            case R.id.suggest3:
+                                selectPosition = 2;
+                                break;
+                        }
+                        if (position[selectPosition] == 1) {
+                            setSuggestionList();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (position[selectPosition] == 1) {
+                            editView.setText(suggestItemList.get(selectPosition * 3 + selected).getText());
+                            editView.setSelection(editView.getText().length());
+                            getSuggestion(String.valueOf(editView.getText()));
+                            removeSuggestionList();
+                        } else {
+                            editView.setText(suggestViewList.get(selectPosition).getText());
+                            editView.setSelection(editView.getText().length());
+                            getSuggestion(String.valueOf(editView.getText()));
+                        }
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (position[selectPosition] == 1) {
+                            selected = (int) (event.getY() / 158);
+                        }
+                        break;
+                }
+                break;
             case R.id.change_list_view:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -236,13 +254,35 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                             if (editView.getText().length() > 0) {
                                 getSuggestion(String.valueOf(editView.getText()));
                             } else {
-                                for (TextView suggestView : suggestViewList) {
-                                    suggestView.setText("");
+                                switch (suggestionOption) {
+                                    case 1:
+                                        for (TextView suggestView : suggestViewList) {
+                                            suggestView.setText("");
+                                            suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                                        }
+                                        break;
+                                    case 2:
+                                        for (int i = 0; i < octupusItemList.size(); i++) {
+                                            octupusItemList.get(i).setText("");
+                                            octupusItemList.get(i).setVisibility(View.GONE);
+                                        }
+                                        break;
                                 }
                             }
                         } else {
-                            for (TextView suggestView : suggestViewList) {
-                                suggestView.setText("");
+                            switch (suggestionOption) {
+                                case 1:
+                                    for (TextView suggestView : suggestViewList) {
+                                        suggestView.setText("");
+                                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                                    }
+                                    break;
+                                case 2:
+                                    for (int i = 0; i < octupusItemList.size(); i++) {
+                                        octupusItemList.get(i).setText("");
+                                        octupusItemList.get(i).setVisibility(View.GONE);
+                                    }
+                                    break;
                             }
                         }
                         break;
@@ -255,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                         editView.setText("");
                         for (TextView suggestView : suggestViewList) {
                             suggestView.setText("");
+                            suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
                         }
                         break;
                 }
@@ -270,33 +311,32 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
     public void getSuggestion(String input) {
 
-        suggestedList = new String[][]{
-                {"", "", ""},
-                {"", "", ""},
-                {"", "", ""}
+        position = new int[] {
+                0, 0, 0
         };
+        suggestedList = new ArrayList<List<String>>(
+                Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
+        );
         int total = 0;
         for (String item : Source.dictionary) {
-            if (item.indexOf(input) != -1) {
+            if (item.indexOf(input) == 0) {
                 point:
                 {
                     if (total == 9) {
                         break;
                     }
                     for (int row = 0; row < 3; row++) {
-                        if (suggestedList[row][0].equals("")) {
-                            suggestedList[row][0] = item;
+                        if (suggestedList.get(row).size() == 0) {
+                            suggestedList.get(row).add(item);
                             total++;
                             break point;
                         } else {
-                            if (suggestedList[row][0].charAt(0) == item.charAt(0)) {
-                                for (int col = 1; col < 3; col++) {
-                                    if (suggestedList[row][col].equals("")) {
-                                        suggestedList[row][col] = item;
-                                        total++;
-                                        break point;
-                                    }
+                            if (suggestedList.get(row).size() < 3 && suggestedList.get(row).get(0).charAt(0) == item.charAt(0)) {
+                                if (!suggestedList.get(row).contains(item)) {
+                                    suggestedList.get(row).add(item);
+                                    total++;
                                 }
+                                break point;
                             }
                         }
                     }
@@ -304,19 +344,23 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             }
         }
 
+        Log.d(TAG, suggestedList.toString());
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < suggestViewList.size(); i++) {
                     TextView suggestView = suggestViewList.get(i);
-                    suggestView.setText(suggestedList[i][0]);
-                }
-                position = new Random().nextInt(suggestViewList.size());
-                for(int i = 0; i < suggestViewList.size(); i++) {
-                    if (i == position) {
-                        suggestViewList.get(i).setBackground(getResources().getDrawable(R.drawable.border_gray));
+                    if (suggestedList.get(i).size() > 1) {
+                        position[i] = 1;
+                        suggestView.setText(suggestedList.get(i).get(0));
+                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_gray));
+                    } else if (suggestedList.get(i).size() == 1) {
+                        suggestView.setText(suggestedList.get(i).get(0));
+                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
                     } else {
-                        suggestViewList.get(i).setBackground(getResources().getDrawable(R.drawable.border_white));
+                        suggestView.setText("");
+                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
                     }
                 }
             }
@@ -338,21 +382,37 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         switch(suggestionOption) {
             case 1:
                 addContentView(suggetListLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item1));
-                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item2));
-                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item3));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item01));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item02));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item03));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item11));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item12));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item13));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item21));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item22));
+                suggestItemList.add((TextView) findViewById(R.id.suggest_list_item23));
 
                 for (int i = 0; i < suggestItemList.size(); i++) {
-                    suggestItemList.get(i).setText(suggestedList[position][i]);
+                    TextView suggestItemView = suggestItemList.get(i);
+                    int col = i / 3;
+                    int row = i % 3;
+                    if (col == selectPosition) {
+                        if (row == 0) {
+                            suggestItemView.setText(suggestedList.get(col).get(row));
+                            suggestItemView.setVisibility(View.VISIBLE);
+                        } else {
+                            if (suggestedList.get(col).size() > row) {
+                                suggestItemView.setText(suggestedList.get(col).get(row));
+                                suggestItemView.setVisibility(View.VISIBLE);
+                            } else {
+                                suggestItemView.setText("");
+                                suggestItemView.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    } else {
+                        suggestItemView.setVisibility(View.GONE);
+                    }
                 }
-
-                placeholder = (View) findViewById(R.id.placeholder);
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        (float) position
-                );
-                placeholder.setLayoutParams(param);
                 break;
             case 2:
                 addContentView(octupusLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -360,17 +420,30 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 octupusItemList.add((TextView) findViewById(R.id.octupus_item2));
                 octupusItemList.add((TextView) findViewById(R.id.octupus_item3));
                 for (int i = 0; i < octupusItemList.size(); i++) {
-                    octupusItemList.get(i).setText(suggestedList[i][0]);
+                    if (suggestedList.get(i).size() > 0) {
+                        octupusItemList.get(i).setText(suggestedList.get(i).get(0));
+                        octupusItemList.get(i).setVisibility(View.VISIBLE);
+                    } else {
+                        octupusItemList.get(i).setText("");
+                        octupusItemList.get(i).setVisibility(View.GONE);
+                    }
                 }
 
-                Random generator = new Random();
-
+                List<String> prePos = new ArrayList<>();
                 for (int i = 0; i < octupusItemList.size(); i++) {
                     if (octupusItemList.get(i).getText().length() > 0) {
-                        String pos = String.valueOf(keyboardView.keyboardCharList[generator.nextInt(26)]);
-                        int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
-                        int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
-                        octupusItemList.get(i).setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                        int charCode = (int) octupusItemList.get(i).getText().charAt(editView.getText().length()-1);
+                        int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
+                        String pos = String.valueOf(cho[choIndex]);
+                        int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPosKo(pos).split("-")[0]);
+                        int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPosKo(pos).split("-")[1]);
+                        if (prePos.contains(pos)) {
+                            int count = Collections.frequency(prePos, pos);
+                            octupusItemList.get(i).setPadding(paddingLeft, paddingTop - (100 + 40*count), 0, 0);
+                        } else {
+                            octupusItemList.get(i).setPadding(paddingLeft, paddingTop - 100, 0, 0);
+                        }
+                        prePos.add(pos);
                     }
                 }
                 break;
