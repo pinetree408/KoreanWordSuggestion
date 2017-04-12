@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
@@ -150,6 +149,33 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                         break;
                 }
                 break;
+            case R.id.octupus_item1:
+            case R.id.octupus_item2:
+            case R.id.octupus_item3:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        int index = 0;
+                        switch (v.getId()) {
+                            case R.id.octupus_item1:
+                                index = 0;
+                                break;
+                            case R.id.octupus_item2:
+                                index = 1;
+                                break;
+                            case R.id.octupus_item3:
+                                index = 2;
+                                break;
+                        }
+                        editView.setText(octupusItemList.get(index).getText());
+                        editView.setSelection(editView.getText().length());
+                        getSuggestion(String.valueOf(editView.getText()));
+                        if (octupusLayout.getParent() != null) {
+                            removeSuggestionList();
+                        }
+                        setSuggestionList();
+                        break;
+                }
+                break;
             case R.id.change_list_view:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -253,6 +279,14 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                             editView.setSelection(editView.getText().length());
                             if (editView.getText().length() > 0) {
                                 getSuggestion(String.valueOf(editView.getText()));
+                                switch (suggestionOption) {
+                                    case 2:
+                                        if (octupusLayout.getParent() != null) {
+                                            removeSuggestionList();
+                                        }
+                                        setSuggestionList();
+                                        break;
+                                }
                             } else {
                                 switch (suggestionOption) {
                                     case 1:
@@ -421,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 octupusItemList.add((TextView) findViewById(R.id.octupus_item3));
                 for (int i = 0; i < octupusItemList.size(); i++) {
                     if (suggestedList.get(i).size() > 0) {
+                        octupusItemList.get(i).setOnTouchListener(this);
                         octupusItemList.get(i).setText(suggestedList.get(i).get(0));
                         octupusItemList.get(i).setVisibility(View.VISIBLE);
                     } else {
@@ -431,8 +466,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
                 List<String> prePos = new ArrayList<>();
                 for (int i = 0; i < octupusItemList.size(); i++) {
-                    if (octupusItemList.get(i).getText().length() > 0) {
-                        int charCode = (int) octupusItemList.get(i).getText().charAt(editView.getText().length()-1);
+                    if (octupusItemList.get(i).getText().length() > editView.getText().length()) {
+                        int charCode = (int) octupusItemList.get(i).getText().charAt(editView.getText().length());
                         int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
                         String pos = String.valueOf(cho[choIndex]);
                         int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPosKo(pos).split("-")[0]);
@@ -444,6 +479,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                             octupusItemList.get(i).setPadding(paddingLeft, paddingTop - 100, 0, 0);
                         }
                         prePos.add(pos);
+                    } else {
+                        octupusItemList.get(i).setVisibility(View.GONE);
                     }
                 }
                 break;
