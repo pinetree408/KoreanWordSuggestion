@@ -1,6 +1,7 @@
 package com.example.leesangyoon.koeranwordsuggestion;
 
 import android.content.Context;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,9 +43,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     List<TextView> suggestItemList;
 
     private KeyboardView keyboardView;
-    private TextView enterView;
-    private TextView spaceView;
-    private TextView deleteView;
 
     List<List<String>> suggestedList;
 
@@ -75,24 +73,26 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         changeOctupus = (Button) findViewById(R.id.change_octupus);
         changeListView = (Button) findViewById(R.id.change_list_view);
 
-        suggestViewList = new ArrayList<TextView>();
+        suggestViewList = new ArrayList<>();
         suggestViewList.add((TextView) findViewById(R.id.suggest1));
         suggestViewList.add((TextView) findViewById(R.id.suggest2));
         suggestViewList.add((TextView) findViewById(R.id.suggest3));
 
-        suggestItemList = new ArrayList<TextView>();
-        octupusItemList = new ArrayList<TextView>();
+        suggestItemList = new ArrayList<>();
+        octupusItemList = new ArrayList<>();
 
         LayoutInflater vi1 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        suggetListLayout = vi1.inflate(R.layout.suggest_list, null);
+        int suggestListId = R.layout.suggest_list;
+        suggetListLayout = vi1.inflate(suggestListId, null);
 
         LayoutInflater vi2 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        octupusLayout = vi2.inflate(R.layout.octupus_layout, null);
+        int octupusLayoutId = R.layout.octupus_layout;
+        octupusLayout = vi2.inflate(octupusLayoutId, null);
 
         keyboardView = (KeyboardView) findViewById(R.id.keyboard);
-        enterView = (TextView) findViewById(R.id.enter);
-        spaceView = (TextView) findViewById(R.id.space);
-        deleteView = (TextView) findViewById(R.id.delete);
+        TextView enterView = (TextView) findViewById(R.id.enter);
+        TextView spaceView = (TextView) findViewById(R.id.space);
+        TextView deleteView = (TextView) findViewById(R.id.delete);
 
         changeOctupus.setOnTouchListener(this);
         changeListView.setOnTouchListener(this);
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         String[] params = getInputInfo(event);
-                        String inputString = "";
+                        String inputString;
                         if (editView.getText().length() > 0) {
                             char targetChar = editView.getText().charAt(editView.getText().length()-1);
                             int charCode = (int) targetChar;
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             case R.id.space:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        editView.setText(editView.getText() + " ");
+                        editView.append(" ");
                         editView.setSelection(editView.getText().length());
                         getSuggestion(String.valueOf(editView.getText()));
                         break;
@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                     case 1:
                                         for (TextView suggestView : suggestViewList) {
                                             suggestView.setText("");
-                                            suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                                            suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
                                         }
                                         break;
                                     case 2:
@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                 case 1:
                                     for (TextView suggestView : suggestViewList) {
                                         suggestView.setText("");
-                                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                                        suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
                                     }
                                     break;
                                 case 2:
@@ -325,11 +325,11 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             case R.id.enter:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        inputView.setText(inputView.getText() + String.valueOf(editView.getText()));
+                        inputView.append(String.valueOf(editView.getText()));
                         editView.setText("");
                         for (TextView suggestView : suggestViewList) {
                             suggestView.setText("");
-                            suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                            suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
                         }
                         break;
                 }
@@ -339,8 +339,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     }
 
     public int koreanCombine(int choIndex, int jungIndex, int jongIndex) {
-        int combine = 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
-        return combine;
+        return 0xAC00 + 28 * 21 * choIndex + 28 * jungIndex + jongIndex;
     }
 
     public void getSuggestion(String input) {
@@ -388,13 +387,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                     if (suggestedList.get(i).size() > 1) {
                         position[i] = 1;
                         suggestView.setText(suggestedList.get(i).get(0));
-                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_gray));
+                        suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_gray, null));
                     } else if (suggestedList.get(i).size() == 1) {
                         suggestView.setText(suggestedList.get(i).get(0));
-                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                        suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
                     } else {
                         suggestView.setText("");
-                        suggestView.setBackground(getResources().getDrawable(R.drawable.border_white));
+                        suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
                     }
                 }
             }
@@ -503,15 +502,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     public String[] getInputInfo(MotionEvent event) {
         double tempX = (double) event.getAxisValue(MotionEvent.AXIS_X);
         double tempY = (double) event.getAxisValue(MotionEvent.AXIS_Y);
-
         String input = keyboardView.getKey(tempX, tempY);
 
-        String[] params = {
+        return new String[] {
                 String.valueOf(input),
                 String.valueOf(tempX),
                 String.valueOf(tempY)
         };
-        return params;
     }
 
 }
