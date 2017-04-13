@@ -16,24 +16,12 @@ import java.util.List;
 public class KeyboardView extends View {
 
     char[] keyboardCharList = {
-            'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-            'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
-            'z', 'x', 'c', 'v', 'b', 'n', 'm'
-    };
-
-    char[] keyboardCharListKo = {
             'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ',
             'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ',
             'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'
     };
 
     char[][] keyboardChar = {
-            {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
-            {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'},
-            {'z', 'x', 'c', 'v', 'b', 'n', 'm'}
-    };
-
-    char[][] keyboardCharKo = {
             {'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'},
             {'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'},
             {'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'}
@@ -77,17 +65,11 @@ public class KeyboardView extends View {
             return ".";
         }
 
-        return String.valueOf(keyboardCharListKo[id]);
+        return String.valueOf(keyboardCharList[id]);
     }
 
     public String getKeyPos(String a) {
-        String pos = keyboardCharPos.get(new String(keyboardCharList).indexOf(a));
-        return pos;
-    }
-
-    public String getKeyPosKo(String a) {
-        String pos = keyboardCharPos.get(new String(keyboardCharListKo).indexOf(a));
-        return pos;
+        return keyboardCharPos.get(new String(keyboardCharList).indexOf(a));
     }
 
     private void init(AttributeSet attrs, int defStyle) {
@@ -103,7 +85,7 @@ public class KeyboardView extends View {
         keyboardPaint.setTextAlign(Paint.Align.CENTER);
         keyboardPaint.setFakeBoldText(true);
 
-        keyboardCharPos = new ArrayList<String>();
+        keyboardCharPos = new ArrayList<>();
         keyHeightRef = -1.0;
         keyWidthRef = -1.0;
     }
@@ -130,8 +112,8 @@ public class KeyboardView extends View {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 10; j++) {
-                if (j < keyboardCharKo[i].length) {
-                    String content = String.valueOf(keyboardCharKo[i][j]);
+                if (j < keyboardChar[i].length) {
+                    String content = String.valueOf(keyboardChar[i][j]);
 
                     float leftPadding = (float) (keyboardPaddingLeft + j * keyWidth + (keyWidth * 0.5));
                     float topPadding = (float) (keyboardPaddingTop + i * keyHeight + (keyHeight * 0.5));

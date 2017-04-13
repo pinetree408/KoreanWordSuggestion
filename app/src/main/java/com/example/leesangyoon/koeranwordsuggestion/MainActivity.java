@@ -469,8 +469,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                         int charCode = (int) octupusItemList.get(i).getText().charAt(editView.getText().length());
                         int choIndex = ((((charCode - 0xAC00) - (charCode - 0xAC00) % 28)) / 28) / 21;
                         String pos = String.valueOf(cho[choIndex]);
-                        int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPosKo(pos).split("-")[0]);
-                        int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPosKo(pos).split("-")[1]);
+                        int paddingLeft = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[0]);
+                        int paddingTop = (int) Double.parseDouble(keyboardView.getKeyPos(pos).split("-")[1]);
                         if (prePos.contains(pos)) {
                             int count = Collections.frequency(prePos, pos);
                             octupusItemList.get(i).setPadding(paddingLeft, paddingTop - (100 + 40*count), 0, 0);
