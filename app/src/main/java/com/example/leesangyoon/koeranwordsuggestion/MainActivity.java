@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
     View suggetListLayout;
     int selectPosition;
-    int[] position;
     int selected;
     List<TextView> suggestViewList;
 
@@ -63,9 +62,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         suggestedList = new ArrayList<List<String>>(
                 Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
         );
-        position = new int[] {
-                0, 0, 0
-        };
 
         editView = (EditText) findViewById(R.id.edit);
         inputView = (TextView) findViewById(R.id.input);
@@ -126,26 +122,16 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                 selectPosition = 2;
                                 break;
                         }
-                        if (position[selectPosition] == 1) {
-                            setSuggestionList();
-                        }
+                        setSuggestionList();
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (position[selectPosition] == 1) {
-                            editView.setText(suggestItemList.get(selectPosition * 3 + selected).getText());
-                            editView.setSelection(editView.getText().length());
-                            getSuggestion(String.valueOf(editView.getText()));
-                            removeSuggestionList();
-                        } else {
-                            editView.setText(suggestViewList.get(selectPosition).getText());
-                            editView.setSelection(editView.getText().length());
-                            getSuggestion(String.valueOf(editView.getText()));
-                        }
+                        editView.setText(suggestItemList.get(selectPosition * 3 + selected).getText());
+                        editView.setSelection(editView.getText().length());
+                        getSuggestion(String.valueOf(editView.getText()));
+                        removeSuggestionList();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (position[selectPosition] == 1) {
-                            selected = (int) (event.getY() / 158);
-                        }
+                        selected = (int) (event.getY() / 158);
                         break;
                 }
                 break;
@@ -344,9 +330,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
     public void getSuggestion(String input) {
 
-        position = new int[] {
-                0, 0, 0
-        };
         suggestedList = new ArrayList<List<String>>(
                 Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
         );
@@ -385,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 for (int i = 0; i < suggestViewList.size(); i++) {
                     TextView suggestView = suggestViewList.get(i);
                     if (suggestedList.get(i).size() > 1) {
-                        position[i] = 1;
                         suggestView.setText(suggestedList.get(i).get(0));
                         suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_gray, null));
                     } else if (suggestedList.get(i).size() == 1) {
