@@ -1,6 +1,7 @@
 package com.example.leesangyoon.koeranwordsuggestion;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,14 +39,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     private int suggestionOption = 1;
 
     View suggetListLayout;
+    List<TextView> suggestViewList;
+    List<TextView> suggestItemList;
     int selectPosition;
     int selected;
-    List<TextView> suggestViewList;
 
     View octupusLayout;
     List<TextView> octupusItemList;
-
-    List<TextView> suggestItemList;
 
     private KeyboardView keyboardView;
 
@@ -54,10 +60,39 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
+    private Handler mHandler;
+    private Socket socket;
+
+    private BufferedReader networkReader;
+    private BufferedWriter networkWriter;
+
+    private String ip = "143.248.53.191";
+    private int port = 5000;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mHandler = new Handler();
+
+        try {
+            setSocket(ip, port);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        checkUpdate.start();
 
         suggestedList = new ArrayList<List<String>>(
                 Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
@@ -493,4 +528,41 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         };
     }
 
+    private Thread checkUpdate = new Thread() {
+
+        public void run() {
+            try {
+                String line;
+                Log.w("ChattingStart", "Start Thread");
+                while (true) {
+                    Log.w("Chatting is running", "chatting is running");
+                    line = networkReader.readLine();
+                    Log.d(TAG, line);
+                    //mHandler.post(showUpdate);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+    };
+
+    private Runnable showUpdate = new Runnable() {
+
+        public void run() {
+            Log.d(TAG, "test");
+        }
+
+    };
+
+    public void setSocket(String ip, int port) throws IOException {
+
+        try {
+            socket = new Socket(ip, port);
+            networkWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            networkReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
