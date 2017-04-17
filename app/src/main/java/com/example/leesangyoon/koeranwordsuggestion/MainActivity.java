@@ -1,7 +1,7 @@
 package com.example.leesangyoon.koeranwordsuggestion;
 
 import android.content.Context;
-import android.os.Handler;
+import android.os.AsyncTask;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,16 +16,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
@@ -60,39 +64,15 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
-    private Handler mHandler;
-    private Socket socket;
-
-    private BufferedReader networkReader;
-    private BufferedWriter networkWriter;
-
     private String ip = "143.248.53.191";
     private int port = 5000;
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    Socket socket;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mHandler = new Handler();
-
-        try {
-            setSocket(ip, port);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-
-        checkUpdate.start();
 
         suggestedList = new ArrayList<List<String>>(
                 Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
@@ -136,6 +116,43 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             final TextView suggestView = suggestViewList.get(i);
             suggestView.setOnTouchListener(this);
         }
+
+        try {
+            socket = IO.socket("http://" + ip + ":" + port + "/mynamespace");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+
+            @Override
+            public void call(Object... args) {
+                Log.d(TAG, "connect");
+            }
+
+        }).on("response", new Emitter.Listener() {
+
+            @Override
+            public void call(Object... args) {
+                JSONObject obj = null;
+                if (args.length == 1) {
+                    obj = (JSONObject)args[0];
+                    try {
+                        setSuggestedList(obj.get("data"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    obj = (JSONObject)args[1];
+                }
+            }
+
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+
+            @Override
+            public void call(Object... args) {}
+
+        });
+        socket.connect();
     }
 
     @Override
@@ -364,35 +381,35 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     }
 
     public void getSuggestion(String input) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("data", input);
+            obj.put("type", "character");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.emit("request", obj);
+    }
+
+    public void setSuggestedList(Object object) {
 
         suggestedList = new ArrayList<List<String>>(
                 Arrays.asList(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>())
         );
-        int total = 0;
-        for (String item : Source.dictionary) {
-            if (item.indexOf(input) == 0) {
-                point:
-                {
-                    if (total == 9) {
-                        break;
-                    }
-                    for (int row = 0; row < 3; row++) {
-                        if (suggestedList.get(row).size() == 0) {
-                            suggestedList.get(row).add(item);
-                            total++;
-                            break point;
-                        } else {
-                            if (suggestedList.get(row).size() < 3 && suggestedList.get(row).get(0).charAt(0) == item.charAt(0)) {
-                                if (!suggestedList.get(row).contains(item)) {
-                                    suggestedList.get(row).add(item);
-                                    total++;
-                                }
-                                break point;
-                            }
-                        }
-                    }
+        try {
+            JSONObject jsonObject = new JSONObject(object.toString());
+            Iterator<String> jsonKeys = jsonObject.keys();
+            int index = 0;
+            while(jsonKeys.hasNext()) {
+                String list = jsonObject.get(jsonKeys.next()).toString();
+                String[] array = list.substring(1, list.length()-1).split(",");
+                for (String item : array) {
+                    suggestedList.get(index).add(item.substring(1, item.length()-1));
                 }
+                index++;
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         Log.d(TAG, suggestedList.toString());
@@ -526,43 +543,5 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 String.valueOf(tempX),
                 String.valueOf(tempY)
         };
-    }
-
-    private Thread checkUpdate = new Thread() {
-
-        public void run() {
-            try {
-                String line;
-                Log.w("ChattingStart", "Start Thread");
-                while (true) {
-                    Log.w("Chatting is running", "chatting is running");
-                    line = networkReader.readLine();
-                    Log.d(TAG, line);
-                    //mHandler.post(showUpdate);
-                }
-            } catch (Exception e) {
-
-            }
-        }
-    };
-
-    private Runnable showUpdate = new Runnable() {
-
-        public void run() {
-            Log.d(TAG, "test");
-        }
-
-    };
-
-    public void setSocket(String ip, int port) throws IOException {
-
-        try {
-            socket = new Socket(ip, port);
-            networkWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            networkReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 }
