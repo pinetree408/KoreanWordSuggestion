@@ -276,10 +276,14 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                 }
                             } else {
                                 int choIndex = getIndexOf(cho, targetChar);
-                                int jungIndex = getIndexOf(jung, params[0].charAt(0));
-                                int combine = koreanCombine(choIndex, jungIndex, 0);
-                                inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
-                                inputString += (char) combine;
+                                if (choIndex != -1) {
+                                    int jungIndex = getIndexOf(jung, params[0].charAt(0));
+                                    int combine = koreanCombine(choIndex, jungIndex, 0);
+                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                    inputString += (char) combine;
+                                } else {
+                                    inputString = editView.getText() + params[0];
+                                }
                             }
                         } else {
                             inputString = editView.getText() + params[0];
@@ -381,9 +385,10 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     }
 
     public void getSuggestion(String input) {
+        Log.d(TAG, String.valueOf(editView.getText()));
         JSONObject obj = new JSONObject();
         try {
-            obj.put("data", input);
+            obj.put("data", editView.getText());
             obj.put("type", "character");
         } catch (JSONException e) {
             e.printStackTrace();
