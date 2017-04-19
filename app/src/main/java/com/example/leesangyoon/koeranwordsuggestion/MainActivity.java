@@ -385,11 +385,14 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     }
 
     public void getSuggestion(String input) {
-        Log.d(TAG, String.valueOf(editView.getText()));
         JSONObject obj = new JSONObject();
         try {
+            String type = "word";
+            if (editView.getText().length() == 1 && getIndexOf(cho, editView.getText().charAt(0)) != -1) {
+                type = "character";
+            }
             obj.put("data", editView.getText());
-            obj.put("type", "character");
+            obj.put("type", type);
         } catch (JSONException e) {
             e.printStackTrace();
         }
