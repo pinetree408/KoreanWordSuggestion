@@ -1,7 +1,6 @@
 package com.example.leesangyoon.koeranwordsuggestion;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
             'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
 
-    private String ip = "143.248.53.191";
-    private int port = 5000;
+    String ip = "143.248.53.191";
+    int port = 5000;
 
     Socket socket;
 
@@ -133,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
             @Override
             public void call(Object... args) {
-                JSONObject obj = null;
+                JSONObject obj;
                 if (args.length == 1) {
                     obj = (JSONObject)args[0];
                     try {
@@ -144,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                 } else {
                     obj = (JSONObject)args[1];
                 }
+                Log.d(TAG, obj.toString());
             }
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
@@ -391,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             if (editView.getText().length() == 1 && getIndexOf(cho, editView.getText().charAt(0)) != -1) {
                 type = "character";
             }
-            obj.put("data", editView.getText());
+            obj.put("data", input);
             obj.put("type", type);
         } catch (JSONException e) {
             e.printStackTrace();
