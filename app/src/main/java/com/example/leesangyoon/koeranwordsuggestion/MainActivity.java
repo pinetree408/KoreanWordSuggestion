@@ -270,7 +270,61 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                         inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
                                         inputString += (char) combine;
                                     } else {
-                                        inputString = editView.getText() + params[0];
+                                        jongIndex = getIndexOf(jung, params[0].charAt(0));
+                                        if (jongIndex != -1) {
+                                            if (jungIndex == 8) {
+                                                if (jongIndex == 0 | jongIndex == 1 | jongIndex == 20) {
+                                                    switch (jongIndex) {
+                                                        case 0:
+                                                            jungIndex += 1;
+                                                            break;
+                                                        case 1:
+                                                            jungIndex += 2;
+                                                            break;
+                                                        case 20:
+                                                            jungIndex += 3;
+                                                            break;
+                                                    }
+                                                    int combine = koreanCombine(choIndex, jungIndex, 0);
+                                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                                    inputString += (char) combine;
+                                                } else {
+                                                    inputString = editView.getText() + params[0];
+                                                }
+                                            } else if (jungIndex == 13) {
+                                                if (jongIndex == 4 | jongIndex == 5 | jongIndex == 20) {
+                                                    switch (jongIndex) {
+                                                        case 4:
+                                                            jungIndex += 1;
+                                                            break;
+                                                        case 5:
+                                                            jungIndex += 2;
+                                                            break;
+                                                        case 20:
+                                                            jungIndex += 3;
+                                                            break;
+                                                    }
+                                                    int combine = koreanCombine(choIndex, jungIndex, 0);
+                                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                                    inputString += (char) combine;
+                                                } else {
+                                                    inputString = editView.getText() + params[0];
+                                                }
+                                            } else if (jungIndex == 18) {
+                                                if (jongIndex == 20) {
+                                                    jungIndex += 1;
+                                                    int combine = koreanCombine(choIndex, jungIndex, 0);
+                                                    inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                                    inputString += (char) combine;
+                                                } else {
+                                                    inputString = editView.getText() + params[0];
+                                                }
+                                            } else {
+                                                inputString = editView.getText() + params[0];
+                                            }
+                                        } else {
+                                            inputString = editView.getText() + params[0];
+                                        }
                                     }
                                 }
                             } else {
