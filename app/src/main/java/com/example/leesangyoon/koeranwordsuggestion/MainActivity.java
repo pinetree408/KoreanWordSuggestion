@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         octupusLayout = vi2.inflate(octupusLayoutId, null);
 
         keyboardView = (KeyboardView) findViewById(R.id.keyboard);
+        TextView shiftView = (TextView) findViewById(R.id.shift);
         TextView enterView = (TextView) findViewById(R.id.enter);
         TextView spaceView = (TextView) findViewById(R.id.space);
         TextView deleteView = (TextView) findViewById(R.id.delete);
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         changeOctupus.setOnTouchListener(this);
         changeListView.setOnTouchListener(this);
         keyboardView.setOnTouchListener(this);
+        shiftView.setOnTouchListener(this);
         enterView.setOnTouchListener(this);
         spaceView.setOnTouchListener(this);
         deleteView.setOnTouchListener(this);
@@ -354,6 +356,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                 setSuggestionList();
                                 break;
                         }
+                        break;
+                }
+                break;
+            case R.id.shift:
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d(TAG, "Shift test");
                         break;
                 }
                 break;
