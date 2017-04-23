@@ -15,14 +15,30 @@ import java.util.List;
  */
 public class KeyboardView extends View {
 
-    char[] keyboardCharList = {
+    char[] keyboardCharList;
+
+    char[] keyboardCharListBase = {
             'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ',
             'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ',
             'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'
     };
 
-    char[][] keyboardChar = {
+    char[] keyboardCharListShift = {
+            'ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ',
+            'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ',
+            'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'
+    };
+
+    char[][] keyboardChar;
+
+    final char[][] keyboardCharBase = {
             {'ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'},
+            {'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'},
+            {'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'}
+    };
+
+    final char[][] keyboardCharShift = {
+            {'ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'},
             {'ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'},
             {'ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'}
     };
@@ -88,6 +104,19 @@ public class KeyboardView extends View {
         keyboardCharPos = new ArrayList<>();
         keyHeightRef = -1.0;
         keyWidthRef = -1.0;
+
+        keyboardChar = keyboardCharBase;
+        keyboardCharList = keyboardCharListBase;
+    }
+
+    public void setShifted(boolean isShifted) {
+        if (isShifted) {
+            keyboardChar = keyboardCharShift;
+            keyboardCharList = keyboardCharListShift;
+        } else {
+            keyboardChar = keyboardCharBase;
+            keyboardCharList = keyboardCharListBase;
+        }
     }
 
     @Override

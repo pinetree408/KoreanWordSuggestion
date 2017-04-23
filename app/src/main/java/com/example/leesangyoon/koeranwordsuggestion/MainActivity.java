@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
     List<TextView> octupusItemList;
 
     private KeyboardView keyboardView;
+    boolean isShifted;
 
     List<List<String>> suggestedList;
 
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         octupusLayout = vi2.inflate(octupusLayoutId, null);
 
         keyboardView = (KeyboardView) findViewById(R.id.keyboard);
+        isShifted = false;
+
         TextView shiftView = (TextView) findViewById(R.id.shift);
         TextView enterView = (TextView) findViewById(R.id.enter);
         TextView spaceView = (TextView) findViewById(R.id.space);
@@ -362,7 +365,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             case R.id.shift:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.d(TAG, "Shift test");
+                        if (isShifted) {
+                            isShifted = false;
+                        } else {
+                            isShifted = true;
+                        }
+                        keyboardView.setShifted(isShifted);
+                        keyboardView.invalidate();
                         break;
                 }
                 break;
