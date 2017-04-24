@@ -181,7 +181,11 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                         setSuggestionList();
                         break;
                     case MotionEvent.ACTION_UP:
-                        editView.append(suggestItemList.get(selectPosition * 3 + selected).getText());
+                        if (getIndexOf(cho, editView.getText().charAt(editView.getText().length()-1)) != -1){
+                            editView.setText(suggestItemList.get(selectPosition * 3 + selected).getText());
+                        } else {
+                            editView.append(" " + suggestItemList.get(selectPosition * 3 + selected).getText());
+                        }
                         editView.setSelection(editView.getText().length());
                         getSuggestion(String.valueOf(editView.getText()));
                         removeSuggestionList();
