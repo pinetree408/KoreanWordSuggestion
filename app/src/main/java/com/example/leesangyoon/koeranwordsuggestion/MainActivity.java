@@ -262,8 +262,92 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                 int jongIndex = (charCode - 0xAC00) % 28;
 
                                 if (jongIndex > 0) {
+                                    //char[] jong = { ' ', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ',
+                                    //        'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
+                                    //        'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ' };
                                     if (getIndexOf(cho, params[0].charAt(0)) != -1) {
-                                        inputString = editView.getText() + params[0];
+                                        int tempIdx = getIndexOf(jong, params[0].charAt(0));
+                                        int finalIdx = -1;
+                                        boolean isChanged = false;
+                                        switch (jongIndex){
+                                            case 1: // ㄱ
+                                                switch(tempIdx) {
+                                                    case 1:
+                                                        // ㄲ
+                                                        isChanged = true;
+                                                        finalIdx = 2;
+                                                        break;
+                                                    case 19:
+                                                        // ㄱㅅ
+                                                        isChanged = true;
+                                                        finalIdx = 3;
+                                                        break;
+                                                }
+                                                break;
+                                            case 4: // ㄴ
+                                                switch (tempIdx) {
+                                                    case 22:
+                                                        // ㄴㅈ
+                                                        isChanged = true;
+                                                        finalIdx = 5;
+                                                        break;
+                                                }
+                                                break;
+                                            case 8: // ㄹ
+                                                switch (tempIdx) {
+                                                    case 1:
+                                                        // ㄹㄱ
+                                                        isChanged = true;
+                                                        finalIdx = 9;
+                                                        break;
+                                                    case 16:
+                                                        // ㄹㅁ
+                                                        isChanged = true;
+                                                        finalIdx = 10;
+                                                        break;
+                                                    case 17:
+                                                        // ㄹㅂ
+                                                        isChanged = true;
+                                                        finalIdx = 11;
+                                                        break;
+                                                    case 19:
+                                                        // ㄹㅅ
+                                                        isChanged = true;
+                                                        finalIdx = 12;
+                                                        break;
+                                                    case 25:
+                                                        // ㄹㅌ
+                                                        isChanged = true;
+                                                        finalIdx = 13;
+                                                        break;
+                                                    case 26:
+                                                        // ㄹㅍ
+                                                        isChanged = true;
+                                                        finalIdx = 14;
+                                                        break;
+                                                    case 27:
+                                                        // ㄹㅎ
+                                                        isChanged = true;
+                                                        finalIdx = 15;
+                                                        break;
+                                                }
+                                            case 17: //ㅂ
+                                                switch (tempIdx) {
+                                                    case 19:
+                                                        // ㅂㅅ
+                                                        isChanged = true;
+                                                        finalIdx = 18;
+                                                        break;
+                                                }
+                                                break;
+                                        }
+                                        if (isChanged) {
+                                            int combine = koreanCombine(choIndex, jungIndex, finalIdx);
+                                            inputString = String.valueOf(editView.getText().subSequence(0, editView.getText().length() - 1));
+                                            inputString += (char) combine;
+                                        } else {
+                                            inputString = editView.getText() + params[0];
+                                        }
                                     } else {
                                         int preCombine = koreanCombine(choIndex, jungIndex, 0);
                                         int combine = koreanCombine(getIndexOf(cho, jong[jongIndex]), getIndexOf(jung, params[0].charAt(0)), 0);
