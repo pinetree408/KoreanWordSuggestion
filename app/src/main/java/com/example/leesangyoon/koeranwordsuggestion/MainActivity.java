@@ -331,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
                                                         finalIdx = 15;
                                                         break;
                                                 }
+                                                break;
                                             case 17: //ㅂ
                                                 switch (tempIdx) {
                                                     case 19:
