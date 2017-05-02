@@ -454,11 +454,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             case R.id.shift:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        if (isShifted) {
-                            isShifted = false;
-                        } else {
-                            isShifted = true;
-                        }
+                        isShifted = !isShifted;
                         keyboardView.setShifted(isShifted);
                         keyboardView.invalidate();
                         break;
