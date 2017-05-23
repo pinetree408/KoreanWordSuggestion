@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
 
     View suggetListLayout;
     List<TextView> suggestViewList;
+    List<TextView> suggestSuffixList;
     List<TextView> suggestItemList;
     int selectPosition;
     int selected;
@@ -87,6 +89,14 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
         suggestViewList.add((TextView) findViewById(R.id.suggest1));
         suggestViewList.add((TextView) findViewById(R.id.suggest2));
         suggestViewList.add((TextView) findViewById(R.id.suggest3));
+
+        suggestSuffixList = new ArrayList<>();
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest1_suffix_up));
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest1_suffix_down));
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest2_suffix_up));
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest2_suffix_down));
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest3_suffix_up));
+        suggestSuffixList.add((TextView) findViewById(R.id.suggest3_suffix_down));
 
         suggestItemList = new ArrayList<>();
         octupusItemList = new ArrayList<>();
@@ -576,16 +586,27 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener {
             e.printStackTrace();
         }
 
-        Log.d(TAG, suggestedList.toString());
+        // Log.d(TAG, suggestedList.toString());
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < suggestViewList.size(); i++) {
                     TextView suggestView = suggestViewList.get(i);
+                    TextView suggestSuffixUp = suggestSuffixList.get(i*2);
+                    TextView suggestSuffixDown = suggestSuffixList.get(i*2+1);
+
                     if (suggestedList.get(i).size() > 1) {
                         suggestView.setText(suggestedList.get(i).get(0));
                         suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_gray, null));
+
+                        if (suggestedList.get(i).size() > 2) {
+                            suggestSuffixUp.setText(suggestedList.get(i).get(1));
+                            suggestSuffixDown.setText(suggestedList.get(i).get(2));
+                        } else {
+                            suggestSuffixUp.setText(suggestedList.get(i).get(1));
+                        }
+
                     } else if (suggestedList.get(i).size() == 1) {
                         suggestView.setText(suggestedList.get(i).get(0));
                         suggestView.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.border_white, null));
